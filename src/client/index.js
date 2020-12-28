@@ -1,3 +1,5 @@
+import io from 'socket.io-client';
+
 console.log('Hello');
 
 const canvas = document.getElementById("myCanvas");
@@ -42,5 +44,31 @@ const renderer = {
     },
 };
 
+const sockets = {
+    sockets: null,
+
+    init() {
+        const socketProtocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
+        this.socket = io(`${socketProtocol}://${window.location.host}`, { reconnection: false });
+        this.registerConnection();
+    },
+
+    registerConnection() {
+        const connectedPromise = new Promise(resolve => {
+            this.socket.on('connect', () => {
+                console.log('client connected to server');
+                resolve();
+            });
+        });
+
+        connectedPromise.then(() => {
+            const syncUpdate = (update) => renderer.gameUpdate = update;
+            this.socket.on('update', syncUpdate);
+        });
+    },
+};
+
+// Main initialization
+sockets.init();
 document.addEventListener("keydown", inputs.keyDownHandler.bind(inputs), false);
 setInterval(renderer.render, 1000/60);

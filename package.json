@@ -1,6 +1,12 @@
 {
   "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^3.0.4",
+    "socket.io-client": "^3.0.4",
     "webpack": "^5.11.1",
     "webpack-cli": "^4.3.0"
+  },
+  "scripts": {
+    "server": "node src/server/server.js"
   }
 }
