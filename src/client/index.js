@@ -5,25 +5,36 @@ console.log('Hello');
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
-let x = 10;
-let y = 10;
-let dx = 0;
-let dy = 0;
-
 const inputs = {
     keyDownActions: {
-        'Left':  () => { dx = -2; dy = 0; },
-        'Right': () => { dx =  2; dy = 0; },
-        'Up':    () => { dy = -2; dx = 0; },
-        'Down':  () => { dy =  2; dx = 0; },
+        'ArrowLeft':  { dx: -2, dy: 0 },
+        'ArrowRight': { dx:  2, dy: 0 },
+        'ArrowUp':    { dy: -2, dx: 0 },
+        'ArrowDown':  { dy:  2, dx: 0 },
+
+        'r': { kind: 'Rock' },
+        'p': { kind: 'Paper' },
+        's': { kind: 'Scissor' },
     },
 
     keyDownHandler(e) {
-        let val = e.key.replace('Arrow', '');
-        const fn = this.keyDownActions[val];
-        if (typeof fn == 'function') {
-            fn();
+        let val = e.key;
+        const vals = this.keyDownActions[val];
+        if (vals) {
+            if (vals.kind) {
+                this.emitCoinPlace(vals);
+            } else {
+                this.emitMove(vals);
+            }
         };
+    },
+
+    emitMove({ dx, dy }) {
+        sockets.socket.emit('playerMove', { dx, dy });
+    },
+
+    emitCoinPlace({ kind }) {
+        sockets.socket.emit('coinPlace', { kind });
     },
 };
 
@@ -49,7 +60,7 @@ const renderer = {
             this.draw_coin(coin.x, coin.y, coin.kind);
         });
 
-        update.players.forEach(player => {
+        Object.values(update.players).forEach(player => {
             this.draw_player(player.x, player.y);
         });
     },
