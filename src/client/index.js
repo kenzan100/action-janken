@@ -10,14 +10,6 @@ let y = 10;
 let dx = 0;
 let dy = 0;
 
-function draw_ball(x, y) {
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, Math.PI*2, false);
-    ctx.fillStyle = "green";
-    ctx.fill();
-    ctx.closePath();
-}
-
 const inputs = {
     keyDownActions: {
         'Left':  () => { dx = -2; dy = 0; },
@@ -35,12 +27,39 @@ const inputs = {
     },
 };
 
+const drawer = {
+    draw_circle(x, y, color, radius) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI*2, false);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+    }
+};
+
 const renderer = {
+    gameUpdate: null,
+
     render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        x += dx;
-        y += dy;
-        draw_ball(x, y);
+
+        const update = this.gameUpdate;
+
+        update.coins.forEach(coin => {
+            this.draw_coin(coin.x, coin.y, coin.kind);
+        });
+
+        update.players.forEach(player => {
+            this.draw_player(player.x, player.y);
+        });
+    },
+
+    draw_coin(x, y, kind) {
+        drawer.draw_circle(x, y, 'green', 10);
+    },
+
+    draw_player(x, y) {
+        drawer.draw_circle(x, y, 'green', 30);
     },
 };
 
@@ -63,7 +82,7 @@ const sockets = {
 
         connectedPromise.then(() => {
             const syncUpdate = (update) => renderer.gameUpdate = update;
-            this.socket.on('update', syncUpdate);
+            this.socket.on('gameUpdate', syncUpdate);
         });
     },
 };
@@ -71,4 +90,4 @@ const sockets = {
 // Main initialization
 sockets.init();
 document.addEventListener("keydown", inputs.keyDownHandler.bind(inputs), false);
-setInterval(renderer.render, 1000/60);
+setInterval(renderer.render.bind(renderer), 1000/60);
