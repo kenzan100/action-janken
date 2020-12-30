@@ -20,7 +20,10 @@ const gameLogic = {
 
     joinGame(socket) {
         this.sockets[socket.id] = socket;
-        this.players[socket.id] = { dx: 0, dy: 0, x: 10, y: 10 };
+        this.players[socket.id] = {
+            dx: 0, dy: 0, x: 10, y: 10,
+            state: 'Rock', Rock: 0, Paper: 0, Scissor: 0
+        };
     },
 
     updatePlayer({ dx, dy }, socketId) {
@@ -36,6 +39,9 @@ const gameLogic = {
     },
 
     update() {
+        const coinsToRemove = this.applyCoinCollision();
+        this.coins = this.coins.filter(coin => !coinsToRemove.get(coin));
+
         Object.values(this.players).forEach(player => {
             player.x += player.dx;
             player.y += player.dy;
@@ -51,6 +57,37 @@ const gameLogic = {
             players: this.players,
             coins: this.coins,
         };
+    },
+
+    applyCoinCollision() {
+        const coinsToRemove = new Map();
+        this.coins.forEach(coin => {
+            Object.keys(this.players).forEach(key => {
+                const player = this.players[key];
+                if (this.closeEnough(player.x, player.y, coin.x, coin.y, 30)) {
+                    player[coin.kind] += 1;
+                    player.state = this.setState(player);
+                    coinsToRemove.set(coin, true);
+                }
+            });
+        });
+
+        return coinsToRemove;
+    },
+
+    closeEnough(x1, y1, x2, y2, threshold) {
+        const dx = x1 - x2;
+        const dy = y1 - y2;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        return dist <= threshold;
+    },
+
+    setState(player) {
+        const rps = { Rock: player.Rock, Paper: player.Paper, Scissor: player.Scissor };
+        const max = Math.max.apply(null, Object.values(rps));
+        const idx = Object.values(rps).indexOf(max);
+
+        return Object.keys(rps)[idx];
     },
 };
 

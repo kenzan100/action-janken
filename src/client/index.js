@@ -61,7 +61,7 @@ const renderer = {
         });
 
         Object.values(update.players).forEach(player => {
-            this.draw_player(player.x, player.y);
+            this.draw_player(player.x, player.y, player.state);
         });
     },
 
@@ -69,8 +69,9 @@ const renderer = {
         drawer.draw_circle(x, y, 'green', 10);
     },
 
-    draw_player(x, y) {
-        drawer.draw_circle(x, y, 'green', 30);
+    draw_player(x, y, state) {
+        const map = { Rock: 'green', Paper: 'blue', Scissor: 'yellow' };
+        drawer.draw_circle(x, y, map[state], 30);
     },
 };
 
