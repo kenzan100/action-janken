@@ -39,6 +39,11 @@ const gameLogic = {
         this.coins.push(newCoin);
     },
 
+    removePlayer(sockeID) {
+        delete this.sockets[sockeID];
+        delete this.players[sockeID];
+    },
+
     update() {
         const coinsToRemove = this.applyCoinCollision();
         this.coins = this.coins.filter(coin => !coinsToRemove.get(coin));
@@ -47,6 +52,7 @@ const gameLogic = {
         if (match) {
             this.sockets[match.winner.socketId].emit('match', match);
             this.sockets[match.loser.socketId].emit('match', match);
+            this.removePlayer(match.loser.socketId);
         };
 
         Object.values(this.players).forEach(player => {

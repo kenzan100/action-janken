@@ -8,6 +8,25 @@
          canvas { background: #eee; display: block; margin: 0 auto; }
 
          .hidden { display: none !important; }
+
+         h3 { padding: 20px 0 5px; }
+
+         #win-lose-menu, #play-menu {
+             padding: 20px 30px;
+             background-color: white;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             border-radius: 5px;
+         }
+
+         #win-lose-menu {
+             position: fixed;
+             top: 15%;
+             left: 50%;
+             transform: translateY(-50%) translateX(-50%);
+             text-align: center;
+         }
         </style>
     </head>
     <body>
@@ -21,6 +40,49 @@
         <img id="coin_rock_img"    src="coin-r-images-rock-paper-scissors.png" class="hidden" />
         <img id="coin_paper_img"   src="coin-p-images-rock-paper-scissors.png" class="hidden" />
         <img id="coin_scissor_img" src="coin-s-images-rock-paper-scissors.png" class="hidden" />
+
+        <div id="win-lose-menu" class="hidden">
+            <h3>Rock, paper, scissors!</h3>
+            <p>You were <span id="your-state"></span></p>
+            <p>Opponent was <span id="opponent-state"></span></p>
+            <h2 id="win-lose-result"></h2>
+        </div>
+
+        <div id="play-menu">
+            <div>
+                <h1>Rock paper scissors .io game</h1>
+                <h3>How to play</h3>
+                <p>
+                    Use cursor keys to move.<br />
+                    Press r ("Rock"), p ("Paper"), or s ("Scissor") to place "coins":
+                    <span id="coin-explain">
+                        <img src="coin-r-images-rock-paper-scissors.png" />
+                        <img src="coin-p-images-rock-paper-scissors.png" />
+                        <img src="coin-s-images-rock-paper-scissors.png" />
+                    </span>
+                    <br />
+                </p>
+                <h3>How to win</h3>
+                <p>
+                    Collect coins to change player's shape.<br/>
+                    <b>Your shape is deterimined by the type of coins you have most.</b><br />
+                </p>
+                <p>
+                    When you touch another player, you win or lose based on <a href="https://en.wikipedia.org/wiki/Rock_paper_scissors" target="_blank">the rule of Rock paper scissors.</a><br />
+                </p>
+                <br />
+                <hr />
+
+                <h3>How to make this game</h3>
+                <p>
+                    Read the tutorial: <a href="https://zenn.dev/kenzan100/articles/ba3c7dbf4e642e" target="_blank">How to make an original .io game in 5 days</a>.
+                    <br />
+                    See the source code on <a href="https://github.com/kenzan100/breakout-multi" target="_blank">Github</a>.
+                    <br />
+                    Created by <a href="https://twitter.com/kenzan100">Yuta Miyama</a>.
+                </p>
+            </div>
+        </div>
 
         <script src="main.js"></script>
     </body>
