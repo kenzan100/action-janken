@@ -50,9 +50,19 @@ const drawer = {
 
 const renderer = {
     gameUpdate: null,
+    match: null,
 
     render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (this.match) {
+            if (this.match.loser.socketId == sockets.socket.id) {
+                console.log("You lose!");
+            } else if (this.match.winner.socketId == sockets.socket.id) {
+                console.log("You win!");
+            };
+            this.match = null;
+        }
 
         const update = this.gameUpdate;
 
@@ -94,7 +104,9 @@ const sockets = {
 
         connectedPromise.then(() => {
             const syncUpdate = (update) => renderer.gameUpdate = update;
+            const syncMatch = (match) => renderer.match = match;
             this.socket.on('gameUpdate', syncUpdate);
+            this.socket.on('match', syncMatch);
         });
     },
 };

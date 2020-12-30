@@ -22,7 +22,8 @@ const gameLogic = {
         this.sockets[socket.id] = socket;
         this.players[socket.id] = {
             dx: 0, dy: 0, x: 10, y: 10,
-            state: 'Rock', Rock: 0, Paper: 0, Scissor: 0
+            state: 'Rock', Rock: 0, Paper: 0, Scissor: 0,
+            socketId: socket.id,
         };
     },
 
@@ -41,6 +42,12 @@ const gameLogic = {
     update() {
         const coinsToRemove = this.applyCoinCollision();
         this.coins = this.coins.filter(coin => !coinsToRemove.get(coin));
+
+        const match = this.applyPlayerCollision();
+        if (match) {
+            this.sockets[match.winner.socketId].emit('match', match);
+            this.sockets[match.loser.socketId].emit('match', match);
+        };
 
         Object.values(this.players).forEach(player => {
             player.x += player.dx;
@@ -75,11 +82,47 @@ const gameLogic = {
         return coinsToRemove;
     },
 
+    applyPlayerCollision() {
+        let match = null;
+
+        Object.keys(this.players).forEach(p1_key => {
+            Object.keys(this.players).forEach(p2_key => {
+                if (p1_key === p2_key) { return; };
+
+                const p1 = this.players[p1_key];
+                const p2 = this.players[p2_key];
+                if (this.closeEnough(p1.x, p1.y, p2.x, p2.y, 30)) {
+                    match = this.rock_paper_scissors(p1, p2);
+                }
+            });
+        });
+
+        return match;
+    },
+
     closeEnough(x1, y1, x2, y2, threshold) {
         const dx = x1 - x2;
         const dy = y1 - y2;
         const dist = Math.sqrt(dx * dx + dy * dy);
         return dist <= threshold;
+    },
+
+    rock_paper_scissors(p1, p2) {
+        const table = {
+            Rock:  { Rock: 'tie', Paper: 'lose', Scissor: 'win' },
+            Paper: { Rock: 'win', Paper: 'tie', Scissor: 'lose' },
+            Scissor: { Rock: 'lose', Paper: 'win', Scissor: 'tie' },
+        };
+
+        if (table[p1.state]) {
+            const p1_win_lose = table[p1.state][p2.state];
+            if (p1_win_lose === 'win') {
+                return { winner: p1, loser: p2 };
+            } else if (p1_win_lose === 'lose') {
+                return { winner: p2, loser: p1 };
+            }
+        }
+        return null;
     },
 
     setState(player) {
