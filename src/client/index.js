@@ -5,6 +5,14 @@ console.log('Hello');
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+const rockImage = document.getElementById('rock_img');
+const paperImage = document.getElementById('paper_img');
+const scissorImage = document.getElementById('scissor_img');
+
+const coinRockImage = document.getElementById('coin_rock_img');
+const coinPaperImage = document.getElementById('coin_paper_img');
+const coinScissorImage = document.getElementById('coin_scissor_img');
+
 const inputs = {
     keyDownActions: {
         'ArrowLeft':  { dx: -2, dy: 0 },
@@ -39,13 +47,26 @@ const inputs = {
 };
 
 const drawer = {
-    draw_circle(x, y, color, radius) {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI*2, false);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.closePath();
-    }
+    imageMap:  { Rock: rockImage, Paper: paperImage, Scissor: scissorImage },
+    coinImageMap:  { Rock: coinRockImage, Paper: coinPaperImage, Scissor: coinScissorImage },
+
+    draw_coin(x, y, kind) {
+        ctx.setTransform(1,0,0,1,x,y);
+
+        const img = this.coinImageMap[kind];
+        ctx.drawImage(img, -img.width/2, -img.height/2);
+
+        ctx.setTransform(1,0,0,1,0,0);
+    },
+
+    draw_player(x, y, state) {
+        ctx.setTransform(1,0,0,1,x,y);
+
+        const img = this.imageMap[state];
+        ctx.drawImage(img, -img.width/4, -img.height/2);
+
+        ctx.setTransform(1,0,0,1,0,0);
+    },
 };
 
 const renderer = {
@@ -76,12 +97,11 @@ const renderer = {
     },
 
     draw_coin(x, y, kind) {
-        drawer.draw_circle(x, y, 'green', 10);
+        drawer.draw_coin(x, y, kind);
     },
 
     draw_player(x, y, state) {
-        const map = { Rock: 'green', Paper: 'blue', Scissor: 'yellow' };
-        drawer.draw_circle(x, y, map[state], 30);
+        drawer.draw_player(x, y, state);
     },
 };
 

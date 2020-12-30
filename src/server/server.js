@@ -35,7 +35,7 @@ const gameLogic = {
 
     placeCoin({ kind }, socketId) {
         const player = this.players[socketId];
-        const newCoin = { x: player.x, y: player.y, kind: kind, parentId: socketId };
+        const newCoin = { x: player.x, y: player.y, kind: kind, parentId: socketId, placedAt: Date.now() };
         this.coins.push(newCoin);
     },
 
@@ -71,6 +71,9 @@ const gameLogic = {
         this.coins.forEach(coin => {
             Object.keys(this.players).forEach(key => {
                 const player = this.players[key];
+                if (this.coinHitDelayDuration(player, coin)) {
+                    return;
+                }
                 if (this.closeEnough(player.x, player.y, coin.x, coin.y, 30)) {
                     player[coin.kind] += 1;
                     player.state = this.setState(player);
@@ -80,6 +83,14 @@ const gameLogic = {
         });
 
         return coinsToRemove;
+    },
+
+    coinHitDelayDuration(player, coin) {
+        if (player.socketId === coin.parentId) {
+            return Date.now() - coin.placedAt < 1000;
+        } else {
+            return false;
+        }
     },
 
     applyPlayerCollision() {
